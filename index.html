@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>World Time Dashboard</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 55%, #e2e8f0 100%);
+      color: #0f172a;
+    }
+
+    main {
+      width: min(920px, 92vw);
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #dbeafe;
+      border-radius: 16px;
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.1);
+      padding: 1.5rem;
+    }
+
+    h1 {
+      margin: 0 0 0.75rem;
+      font-size: clamp(1.4rem, 1.2rem + 1vw, 2rem);
+    }
+
+    .subtitle {
+      margin: 0 0 1.5rem;
+      color: #334155;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+
+    .clock-card {
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 0.9rem;
+      background: #fff;
+    }
+
+    .location {
+      font-weight: 700;
+      margin-bottom: 0.35rem;
+    }
+
+    .time {
+      font-size: 1.45rem;
+      font-variant-numeric: tabular-nums;
+      color: #1d4ed8;
+      margin-bottom: 0.2rem;
+    }
+
+    .date {
+      font-size: 0.95rem;
+      color: #475569;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Current Time Around the World</h1>
+    <p class="subtitle">Live clocks for Lewes, London, Singapore, Melbourne, Chicago, Denver, and Los Angelees.</p>
+    <section id="clockGrid" class="grid" aria-live="polite"></section>
+  </main>
+
+  <script>
+    const locations = [
+      { name: 'Lewes, DE', zone: 'America/New_York' },
+      { name: 'London, UK', zone: 'Europe/London' },
+      { name: 'Singapore', zone: 'Asia/Singapore' },
+      { name: 'Melbourne, Australia', zone: 'Australia/Melbourne' },
+      { name: 'Chicago, USA', zone: 'America/Chicago' },
+      { name: 'Denver, USA', zone: 'America/Denver' },
+      { name: 'Los Angelees, USA', zone: 'America/Los_Angeles' }
+    ];
+
+    const grid = document.querySelector('#clockGrid');
+
+    const cards = locations.map((location) => {
+      const card = document.createElement('article');
+      card.className = 'clock-card';
+
+      const locationNode = document.createElement('div');
+      locationNode.className = 'location';
+      locationNode.textContent = location.name;
+
+      const timeNode = document.createElement('div');
+      timeNode.className = 'time';
+
+      const dateNode = document.createElement('div');
+      dateNode.className = 'date';
+
+      card.append(locationNode, timeNode, dateNode);
+      grid.appendChild(card);
+
+      return { zone: location.zone, timeNode, dateNode };
+    });
+
+    function updateClocks() {
+      const now = new Date();
+
+      cards.forEach(({ zone, timeNode, dateNode }) => {
+        timeNode.textContent = new Intl.DateTimeFormat('en-US', {
+          timeZone: zone,
+          hour: 'numeric',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: true
+        }).format(now);
+
+        dateNode.textContent = new Intl.DateTimeFormat('en-US', {
+          timeZone: zone,
+          weekday: 'long',
+          month: 'long',
+          day: 'numeric',
+          year: 'numeric'
+        }).format(now);
+      });
+    }
+
+    updateClocks();
+    setInterval(updateClocks, 1000);
+  </script>
+</body>
+</html>
